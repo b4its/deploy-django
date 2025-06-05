@@ -1,4 +1,4 @@
-# Deploying django project to vps:
+# Deploying Django with nginx and gunicorn:
 - Prerequisites: 
     - Create a requirements.txt file that contains all packages used in project:  
         - `pip freeze > requirements.txt`
