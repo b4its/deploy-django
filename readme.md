@@ -1,5 +1,4 @@
 # Deploying django project to vps:
-
 - Prerequisites: 
     - Create a requirements.txt file that contains all packages used in project:  
         - `pip freeze > requirements.txt`
@@ -41,8 +40,8 @@
     &nbsp;
 
 4. Create & activate virtual environment:
-    - `virtualenv /opt/myproject`
-    - `source /opt/myproject/bin/activate`
+    - `python3 -m venv pyvenv`
+    - `source pyvenv/bin/activate`
     &nbsp;
 
 5. Clone Repository:
@@ -64,17 +63,18 @@
 6. Nginx Configuration:
     - Install nginx:
         - `sudo apt install nginx`
-    - `sudo nano /etc/nginx/sites-available/myproject`
+    - `sudo nano /etc/nginx/sites-available/aesco`
     - Type the following into the file:
          ```nginx
         server {
             listen 80;
-            server_name yourip;
+            # server_name yourip;
+            server_name 192.168.1.1;
 
-            access_log /var/log/nginx/website-name.log;
+            access_log /var/log/nginx/aesco.log;
 
             location /static/ {
-                alias /opt/myproject/myproject/path-to-static-files/;
+                alias /root/path/aesco/static/;
             }
 
             location / {
@@ -87,7 +87,7 @@
          ```
     - Now we need to set up a symbolic link in the /etc/nginx/sites-enabled directory that points to this configuration file. That is how NGINX knows this site is active. Change directories to /etc/nginx/sites-enabled like this:
         - `cd /etc/nginx/sites-enabled`
-        - `sudo ln -s ../sites-available/myproject`
+        - `sudo ln -s ../sites-available/aesco`
 
     - Go to:
         - `/etc/nginx/nginx.conf`
@@ -113,10 +113,12 @@
 8. Testing configuration:
 
     - Run gunicorn:
-        - `cd /opt/myproject/myproject/repo-name`
-        - `gunicorn --bind 0.0.0.0:8000 project_name.wsgi`
+        - `cd  /root/path/aesco/`
+        - `gunicorn --bind 0.0.0.0:8000 aesco.wsgi`
     - Visit your project on your server ip address on port 8000:
         - `yourServerIp:8000`
+    - for example
+        - `192.168.1.1:8000`
 
     &nbsp;
 
@@ -128,7 +130,7 @@
     - Save changes
 
     - Open your nginx configuration file:
-        - `sudo nano /etc/nginx/sites-available/myproject`
+        - `sudo nano /etc/nginx/sites-available/aesco`
 
     - Make the following changes:
 
@@ -144,7 +146,9 @@
             }
 
             location / {
-                proxy_pass yourServerIp:8000;
+                # proxy_pass yourServerIp:8000;
+                proxy_pass 192.168.1.1:8000;
+
                 proxy_set_header X-Forwarded-Host $server_name;
                 proxy_set_header X-Real-IP $remote_addr;
                 add_header P3P 'CP="ALL DSP COR PSAa PSDa OUR NOR ONL UNI COM NAV"';
@@ -168,10 +172,10 @@
     - reload nginx:
         `sudo systemctl reload nginx`
     - run gunicorn:
-        - `gunicorn --bind 0.0.0.0:8000 project_name.wsgi`
+        - `gunicorn --bind 0.0.0.0:8000 aesco.wsgi`
 
 - Run gunicorn in the background:
-    `nohup gunicorn --bind 0.0.0.0:8000 project_name.wsgi &`
+    `nohup gunicorn --bind 0.0.0.0:8000 aesco.wsgi &`
     &nbsp;
 
 - kill gunicorn running in background:
@@ -181,10 +185,11 @@
 - Making changes
 
 # Refrences
+    - https://github.com/TheProtonGuy/server-configs
 
 ## Articles:
- - https://www.digitalocean.com/community/tutorials/how-to-deploy-a-local-django-app-to-a-vps
+    - https://www.digitalocean.com/community/tutorials/how-to-deploy-a-local-django-app-to-a-vps
 
-- https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-22-04
+    - https://www.digitalocean.com/community/tutorials how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-22-04
 
-- https://stackoverflow.com/questions/37339383/nginx-gunicorn-django-not-working
+    - https://stackoverflow.com/questions/37339383/nginx-gunicorn-django-not-working
