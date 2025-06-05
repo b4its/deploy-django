@@ -174,8 +174,36 @@
     - run gunicorn:
         - `gunicorn --bind 0.0.0.0:8000 aesco.wsgi`
 
-- Run gunicorn in the background:
+    - Run gunicorn in the background:
     `nohup gunicorn --bind 0.0.0.0:8000 aesco.wsgi &`
+
+    - open nano nginx sites enabled
+    `sudo nano /etc/nginx/sites-enabled/`
+
+    - SSL Configuration:
+         ```nginx                                                        
+        server {
+            if ($host = www.b4its.tech) {
+                return 301 https://$host$request_uri;
+            } # managed by Certbot
+
+
+            if ($host = b4its.tech) {
+                return 301 https://$host$request_uri;
+            } # managed by Certbot
+
+
+            listen 80;
+            server_name b4its.tech www.b4its.tech;
+
+            # Redirect semua HTTP ke HTTPS
+            return 301 https://$host$request_uri;
+
+
+
+
+        }
+         ```
     &nbsp;
 
 - kill gunicorn running in background:
